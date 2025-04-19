@@ -31,7 +31,7 @@ export const BookmarkCard = ({ bookmark }: { bookmark: Bookmark }) => {
           <Icon className="h-5 w-5" />
         </div>
         <div>
-          <h3 className="font-semibold text-lg line-clamp-1">{bookmark.title}</h3>
+          <h3 className="font-semibold text-lg line-clamp-1 gradient-text">{bookmark.title}</h3>
           <p className="text-xs text-muted-foreground">
             {formatDistanceToNow(bookmark.createdAt, { addSuffix: true })}
           </p>
