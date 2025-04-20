@@ -19,9 +19,11 @@ import {
 } from "@/components/ui/select";
 import { Bookmark, SocialPlatform } from "@/types/bookmark";
 import { BookmarkPlus } from "lucide-react";
+import { isValidUrl, normalizeUrl } from "@/utils/urlUtils";
+import { useToast } from "@/hooks/use-toast";
 
 interface AddBookmarkDialogProps {
-  onAddBookmark: (bookmark: Omit<Bookmark, 'id' | 'createdAt'>) => void;
+  onAddBookmark: (bookmark: Omit<Bookmark, "id" | "createdAt">) => void;
 }
 
 export const AddBookmarkDialog = ({ onAddBookmark }: AddBookmarkDialogProps) => {
@@ -30,15 +32,28 @@ export const AddBookmarkDialog = ({ onAddBookmark }: AddBookmarkDialogProps) => 
   const [url, setUrl] = useState("");
   const [description, setDescription] = useState("");
   const [platform, setPlatform] = useState<SocialPlatform>("twitter");
+  const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    const normalizedUrl = normalizeUrl(url);
+    if (!isValidUrl(normalizedUrl)) {
+      toast({
+        title: "Invalid URL",
+        description: "Please enter a valid URL starting with http:// or https://",
+        variant: "destructive"
+      });
+      return;
+    }
+
     onAddBookmark({
       title,
-      url,
+      url: normalizedUrl,
       description,
       platform,
     });
+    
     setOpen(false);
     setTitle("");
     setUrl("");
