@@ -1,3 +1,4 @@
+
 export const isValidUrl = (url: string): boolean => {
   try {
     const parsedUrl = new URL(url);

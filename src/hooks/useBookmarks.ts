@@ -2,62 +2,73 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@supabase/supabase-js";
 import { Bookmark } from "@/types/bookmark";
+import { useToast } from "@/hooks/use-toast";
 
-// Use a mock Supabase for now - REPLACE THESE WITH YOUR ACTUAL SUPABASE CREDENTIALS
-const supabaseUrl = "https://your-project-url.supabase.co";
-const supabaseKey = "your-anonymous-key";
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(
+  "https://your-project-url.supabase.co",
+  "your-anon-key"
+);
 
 const EXAMPLE_BOOKMARKS: Omit<Bookmark, "id" | "createdAt">[] = [
   {
-    title: "Learn Web Development - MDN",
-    url: "https://developer.mozilla.org/en-US/docs/Learn",
-    platform: "youtube",
-    description: "Comprehensive web development tutorials from Mozilla"
-  },
-  {
-    title: "React Documentation",
+    title: "React Documentation - Learn React",
     url: "https://react.dev",
     platform: "facebook",
-    description: "Official React documentation and tutorials"
+    description: "The official React documentation with interactive examples and comprehensive guides"
+  },
+  {
+    title: "MDN Web Docs - JavaScript",
+    url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
+    platform: "twitter",
+    description: "Mozilla's JavaScript documentation and tutorials"
   },
   {
     title: "TypeScript Handbook",
-    url: "https://www.typescriptlang.org/docs/handbook/intro.html",
-    platform: "twitter",
-    description: "Learn TypeScript from the official handbook"
+    url: "https://www.typescriptlang.org/docs/",
+    platform: "linkedin",
+    description: "Official TypeScript documentation and guides"
   },
   {
-    title: "Web Development Roadmap",
-    url: "https://roadmap.sh/frontend",
-    platform: "linkedin",
-    description: "Frontend development learning path and resources"
+    title: "Tailwind CSS - Documentation",
+    url: "https://tailwindcss.com/docs",
+    platform: "youtube",
+    description: "Learn Tailwind CSS through comprehensive documentation"
   }
 ];
 
 export const useBookmarks = () => {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const { data: bookmarks = [], isLoading } = useQuery({
     queryKey: ["bookmarks"],
     queryFn: async () => {
       const { data: user } = await supabase.auth.getUser();
-      if (!user.user) return [];
+      if (!user.user) {
+        toast({
+          title: "Authentication required",
+          description: "Please log in to access your bookmarks",
+          variant: "destructive"
+        });
+        return [];
+      }
 
       const { data: bookmarks } = await supabase
         .from("bookmarks")
         .select("*")
         .order("created_at", { ascending: false });
 
-      // If no bookmarks exist, add example bookmarks
       if (bookmarks && bookmarks.length === 0) {
-        const { data: exampleBookmarks } = await supabase.from("bookmarks").insert(
-          EXAMPLE_BOOKMARKS.map(bookmark => ({
-            ...bookmark,
-            user_id: user.user.id,
-            is_example: true
-          }))
-        ).select();
+        const { data: exampleBookmarks } = await supabase
+          .from("bookmarks")
+          .insert(
+            EXAMPLE_BOOKMARKS.map(bookmark => ({
+              ...bookmark,
+              user_id: user.user.id,
+              is_example: true
+            }))
+          )
+          .select();
         return exampleBookmarks || [];
       }
 
@@ -77,7 +88,6 @@ export const useBookmarks = () => {
         .eq("user_id", user.user.id)
         .eq("is_example", true);
 
-      // Add the new bookmark
       const { data, error } = await supabase
         .from("bookmarks")
         .insert([
@@ -90,7 +100,20 @@ export const useBookmarks = () => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        toast({
+          title: "Error adding bookmark",
+          description: error.message,
+          variant: "destructive"
+        });
+        throw error;
+      }
+
+      toast({
+        title: "Bookmark added",
+        description: "Your bookmark has been saved successfully"
+      });
+
       return data;
     },
     onSuccess: () => {

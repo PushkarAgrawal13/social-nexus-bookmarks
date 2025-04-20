@@ -33,7 +33,7 @@ export const BookmarkCard = ({ bookmark }: { bookmark: Bookmark }) => {
         <div>
           <h3 className="font-semibold text-lg line-clamp-1 gradient-text">{bookmark.title}</h3>
           <p className="text-xs text-muted-foreground">
-            {formatDistanceToNow(bookmark.createdAt, { addSuffix: true })}
+            {formatDistanceToNow(new Date(bookmark.createdAt), { addSuffix: true })}
           </p>
         </div>
       </CardHeader>
