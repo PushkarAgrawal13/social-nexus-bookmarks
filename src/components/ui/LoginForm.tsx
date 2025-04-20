@@ -7,10 +7,10 @@ import { useToast } from '@/hooks/use-toast';
 import { createClient } from '@supabase/supabase-js';
 import { LogIn, Lock, Mail, KeyRound } from 'lucide-react';
 
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL!, 
-  import.meta.env.VITE_SUPABASE_ANON_KEY!
-);
+// Use a mock Supabase for now - REPLACE THESE WITH YOUR ACTUAL SUPABASE CREDENTIALS
+const supabaseUrl = "https://your-project-url.supabase.co";
+const supabaseKey = "your-anonymous-key";
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export const LoginForm = () => {
   const [email, setEmail] = useState('');

@@ -3,10 +3,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@supabase/supabase-js";
 import { Bookmark } from "@/types/bookmark";
 
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL!,
-  import.meta.env.VITE_SUPABASE_ANON_KEY!
-);
+// Use a mock Supabase for now - REPLACE THESE WITH YOUR ACTUAL SUPABASE CREDENTIALS
+const supabaseUrl = "https://your-project-url.supabase.co";
+const supabaseKey = "your-anonymous-key";
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 const EXAMPLE_BOOKMARKS: Omit<Bookmark, "id" | "createdAt">[] = [
   {
